@@ -1,0 +1,39 @@
+
+
+
+
+
+
+
+ public function save()
+    {
+        $db = \Config\Database::connect();
+        $model = new mtransaksi();
+    
+        // Simpan data dari tabel temp ke dalam tabel transaksi_detail
+        $tempData = $model->add()->getResultArray();
+        foreach ($tempData as $r) {
+            $data1 = array(
+                'nofak_detail' => $this->request->getPost('notransaksi'),
+                'kode_detail' => $r['kdtemp'],
+                'harga_detail' => $r['hargatemp'],
+                'berat_detail' => $r['berattemp']
+            );
+            $model->saveTransaksiDetail($data1);
+        }
+    
+        // Simpan data transaksi ke dalam tabel transaksi
+        $data = array(
+            'notransaksi' => $this->request->getPost('notransaksi'),
+            'tanggaltransaksi' => $this->request->getPost('tanggaltransaksi'),
+            'kdkonsumen_transaksi' => $this->request->getPost('idkonsumen'),
+            'tanggalselesai' => $this->request->getPost('tanggalselesai'),
+            'status' => '1'
+        );
+        $model->savetransaksi($data);
+    
+        // Hapus data dari tabel temp
+        $hapus = $db->query("DELETE FROM temp");
+    
+        return redirect()->to('index');
+    }
